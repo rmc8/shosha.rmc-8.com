@@ -1,8 +1,8 @@
 atproto
-dotenv
+python-dotenv
 python-dateutil
 spacy
 BeautifulSoup4
 lxml
 pillow
-flack
+flask
