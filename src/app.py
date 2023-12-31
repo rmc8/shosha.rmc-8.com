@@ -14,6 +14,7 @@ PASSWORD = os.getenv("APPPASS")
 
 def main():
     # keep_alive()
+    print("Run bot")
     bc = BskyClient(HANDLE, PASSWORD)
     bc.run()
 
