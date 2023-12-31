@@ -67,7 +67,11 @@ class BskyClient:
                 url = contents["url"]
                 pig = PromptImageGenerator(contents)
                 img = pig.gen_image()
-                post_lines = [f"『{contents['title']}』{contents['author']}", "#ランダム書写お題", url]
+                post_lines = [
+                    f"『{contents['title']}』{contents['author']}",
+                    "#ランダム書写お題",
+                    url,
+                ]
                 text = "\n".join(post_lines)
                 ref = self.reply_to(post)
                 self._create_post_with_img(contents=text, img=img, ref_post=ref)
