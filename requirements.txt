@@ -1,0 +1,7 @@
+atproto
+dotenv
+python-dateutil
+spacy
+BeautifulSoup4
+lxml
+pillow
