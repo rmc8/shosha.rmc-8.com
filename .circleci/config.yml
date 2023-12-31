@@ -1,9 +1,9 @@
 version: 2
 jobs:
     build:
-        working_directory: ~/blueditor
+        working_directory: ~/
         docker:
-            - image: circleci/python:3.11
+            - image: circleci/python:3.10
         steps:
             - checkout
             - run:
