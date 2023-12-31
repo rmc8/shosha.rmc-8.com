@@ -50,5 +50,6 @@ def main():
     with open("data.json", "w", encoding="utf-8") as f:
         print(json.dumps(output, ensure_ascii=False), file=f)
 
+
 if __name__ == "__main__":
     main()
