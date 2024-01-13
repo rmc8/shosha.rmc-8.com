@@ -14,6 +14,7 @@ class BskyClient:
         self.password = password
         self.client: Client = self._login()
         self.wp = WritingPromptProvider()
+        print(f"Login: @{handle}")
 
     def _login(self) -> Client:
         c = Client()
@@ -51,13 +52,26 @@ class BskyClient:
         parent = ComAtprotoRepoStrongRef.Main(cid=post.cid, uri=post.uri)
         return ReplyRef(parent=parent, root=parent)
 
-    def _create_post_with_img(self, contents, img, ref_post):
+    @staticmethod
+    def find_byte_position(text, substring):
+        # 文字列をUTF-8でバイト列に変換
+        byte_text = text.encode("utf-8")
+        byte_substring = substring.encode("utf-8")
+        # バイト列内での位置を検索
+        start_position = byte_text.find(byte_substring)
+        if start_position != -1:
+            end_position = start_position + len(byte_substring)
+            return {"byteStart": start_position, "byteEnd": end_position}
+        return {"byteStart": -1, "byteEnd": -1}
+
+    def _create_post_with_img(self, contents, img, ref_post, facets):
         self.client.send_image(
-            text=contents, image=img, image_alt="", reply_to=ref_post
+            text=contents, image=img, image_alt="", reply_to=ref_post, facets=facets
         )
 
     def _monitor_notifications(self):
         notifications = self._get_mention_and_replies()
+        tag = "#ランダム書写お題"
         cnt = len(notifications) // 25 + 1
         for i in range(cnt):
             for post in self._get_posts(notifications[25 * i : 25 * (i + 1)]):
@@ -67,14 +81,29 @@ class BskyClient:
                 url = contents["url"]
                 pig = PromptImageGenerator(contents)
                 img = pig.gen_image()
-                post_lines = [
-                    f"『{contents['title']}』{contents['author']}",
-                    "#ランダム書写お題",
-                    url,
-                ]
+                post_lines = [f"『{contents['title']}』{contents['author']}", tag]
                 text = "\n".join(post_lines)
                 ref = self.reply_to(post)
-                self._create_post_with_img(contents=text, img=img, ref_post=ref)
+                facets = [
+                    {
+                        "index": self.find_byte_position(text, contents["title"]),
+                        "features": [
+                            {"$type": "app.bsky.richtext.facet#link", "uri": url}
+                        ],
+                    },
+                    {
+                        "index": self.find_byte_position(text, tag),
+                        "features": [
+                            {
+                                "$type": "app.bsky.richtext.facet#tag",
+                                "tag": tag.strip("#"),
+                            }
+                        ],
+                    },
+                ]
+                self._create_post_with_img(
+                    contents=text, img=img, ref_post=ref, facets=facets
+                )
                 print("Done")
 
     def run(self):
