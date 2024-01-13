@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from atproto_client import Client
 from atproto_client.models.app.bsky.feed.post import ReplyRef
@@ -112,6 +113,7 @@ class BskyClient:
                 self._monitor_notifications()
             except Exception as e:
                 print(f"An error occurred: {e}")
+                print(traceback.format_exc())
                 self.client = self._login()
             finally:
                 time.sleep(10)
