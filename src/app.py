@@ -22,7 +22,8 @@ def main():
     try:
         print("Run bot")
         bc.run()
-    except Exception as _:
+    except Exception as e:
+        print(e)
         msg: str = traceback.format_exc()
         payload = {"error_msg": msg}
         headers = {"Content-Type": "application/json"}
