@@ -21,28 +21,24 @@ class PromptImageGenerator:
         self.font_bold = ImageFont.truetype(FONT_BOLD_PATH, BIG_FONT_SIZE)
 
     @staticmethod
-    def _get_lines(text: str, length: int = 30) -> List[str]:
+    def _get_index(t: str, length: int) -> int:
+        split_index = t.find("\n", 0, length)
+        if split_index == -1 or split_index > length:
+            split_index = length
+        if t[split_index] in {"、", "。"}:
+            split_index += 1
+        elif t[split_index : split_index + 2] == "。」":
+            split_index += 2
+        return split_index
+
+    def _get_lines(self, text: str, length: int = 30) -> List[str]:
         lines: List[str] = []
         while text:
-            if len(text) > length:
-                # 最後のスペースの位置を見つけて行を分割する
-                split_index = text.rfind(" ", 0, length)
-                if split_index == -1:  # スペースが見つからない場合
-                    split_index = length
-
-                # 特定の記号を考慮して行を調整
-                if text[split_index] in {"、", "。"}:
-                    split_index += 1
-                elif text[split_index : split_index + 2] == "。」":
-                    split_index += 2
-
-                line = text[:split_index].strip()
-                text = text[split_index:].strip()
-            else:
-                line = text
-                text = ""
+            split_index = self._get_index(text, length)
+            line = text[:split_index].strip()
+            text = text[split_index:].strip()
             lines.append(line)
-        return lines
+        return self._rstrip_lines(lines)
 
     def gen_image(self):
         # Contents
