@@ -25,10 +25,13 @@ class PromptImageGenerator:
         split_index = t.find("\n", 0, length)
         if split_index == -1 or split_index > length:
             split_index = length
-        if t[split_index] in {"、", "。"}:
-            split_index += 1
-        elif t[split_index : split_index + 2] == "。」":
-            split_index += 2
+        try:
+            if t[split_index] in {"、", "。"}:
+                split_index += 1
+            elif t[split_index : split_index + 2] == "。」":
+                split_index += 2
+        except IndexError:
+            return split_index
         return split_index
 
     def _get_lines(self, text: str, length: int = 30) -> List[str]:
