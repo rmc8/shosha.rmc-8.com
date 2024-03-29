@@ -21,14 +21,28 @@ class PromptImageGenerator:
         self.font_bold = ImageFont.truetype(FONT_BOLD_PATH, BIG_FONT_SIZE)
 
     @staticmethod
+    def _rstrip_lines(lns: List[str]) -> List[str]:
+        rm_lines = 0
+        for i, _ in enumerate(lns, 1):
+            if lns[-i]:
+                break
+            rm_lines += 1
+        for _ in range(rm_lines):
+            lns.pop()
+        return lns
+
+    @staticmethod
     def _get_index(t: str, length: int) -> int:
         split_index = t.find("\n", 0, length)
         if split_index == -1 or split_index > length:
             split_index = length
-        if t[split_index] in {"、", "。"}:
-            split_index += 1
-        elif t[split_index : split_index + 2] == "。」":
-            split_index += 2
+        try:
+            if t[split_index] in {"、", "。"}:
+                split_index += 1
+            elif t[split_index : split_index + 2] == "。」":
+                split_index += 2
+        except IndexError:
+            return split_index
         return split_index
 
     def _get_lines(self, text: str, length: int = 30) -> List[str]:
